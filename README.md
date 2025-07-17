@@ -1,36 +1,31 @@
 # 🧠 Resume Classifier — NLP + Machine Learning Project
 
-
-
 Automatically classifies resumes into job categories using NLP techniques and multiple machine learning models.
-
 
 ---
 
 ## 📁 Project Structure
 
----
 
-Resume-Classifier-ML-Project/
+ Resume-Classifier-ML-Project/
 ├── data/
-│   ├── download_data.ipynb
-│   └── resume-dataset/
-│       └── UpdatedResumeDataSet.csv
+│ ├── download_data.ipynb
+│ └── resume-dataset/
+│ └── UpdatedResumeDataSet.csv
 ├── notebook/
-│   ├── 01_EDA_Resume.ipynb
-│   ├── 02_Preprocessing_Resume.ipynb
-│   ├── 03_Model_Training_Evaluation.ipynb
-│   └── 04_Tuning_Model.ipynb
+│ ├── 01_EDA_Resume.ipynb
+│ ├── 02_Preprocessing_Resume.ipynb
+│ ├── 03_Model_Training_Evaluation.ipynb
+│ └── 04_Tuning_Model.ipynb
 ├── models/
-│   ├── X_train.joblib
-│   ├── X_test.joblib
-│   ├── y_train.joblib
-│   └── y_test.joblib
+│ ├── X_train.joblib
+│ ├── X_test.joblib
+│ ├── y_train.joblib
+│ └── y_test.joblib
 ├── images/
-│   ├── 0.png ... 4.png
+│ ├── 0.png ... 4.png
 ├── .gitignore
 └── README.md
-
 
 
 ---
@@ -72,14 +67,32 @@ Evaluated several classifiers using accuracy, confusion matrix, and classificati
 | One-vs-Rest (SVC)   | 0.79     |
 | One-vs-Rest (KNN)   | 0.82     |
 
-### 4. 🔧 Hyperparameter Tuning
 
-- Hyperparameters for **SVC** and **KNN** were optimized using the Optuna library.
-> 🔍 Note: The Optuna optimization code was removed after applying the best parameters. You can easily re-integrate Optuna if needed.
-- This improved the model's generalization:
-  - **Training Accuracy**: decreased slightly (92% → 88%) to reduce overfitting
-  - **Testing Accuracy**: improved (82% → 85%)
 
+## 🔧 Advanced Tuning & Local SVM
+
+In `04_Tuning_Model.ipynb`, we applied two main optimization techniques:
+
+### A. Hyperparameter Tuning with Optuna
+
+- Optimized `C`, `kernel`, and `gamma` parameters for SVC.
+- Improved generalization:
+  - **Training Accuracy**: dropped slightly (92% → 88%) to reduce overfitting.
+  - **Testing Accuracy**: increased (82% → 85%).
+
+
+> 🔍 Note: The Optuna optimization code was removed after applying the best
+
+
+We implemented a **Localized SVM** approach:
+
+- For every resume vector (training or test):
+  - Find the `k` nearest neighbors using `sklearn.NearestNeighbors`.
+  - Train a dedicated `SVC` model only on those neighbors.
+  - Use it to predict the class of the target point.
+- If training fails (e.g., only one class), we fallback to the global majority class.
+
+> This method captures **local patterns** in the data and is especially useful in **non-linear or imbalanced** datasets. However, it is computationally expensive, as it trains an SVM for every single point.
 
 
 ---
@@ -91,9 +104,9 @@ Evaluated several classifiers using accuracy, confusion matrix, and classificati
 
 ## 📌 Future Improvements
 
-- Use advanced NLP techniques such as **BERT** or **spaCy** to improve model accuracy.
-- Implement **resume sectioning** (e.g., skills, experience, education) for more granular classification.
-- Deploy the model using a web interface like **Streamlit** or **Flask**.
+- Use advanced NLP models like **BERT**, **spaCy**, or **LlamaIndex**.
+- Segment resume content into sections (e.g., skills, education) before classification.
+- Build a **Streamlit** or **Flask** app to deploy the model.
 
 
 ## 📬 Contact
