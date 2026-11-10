@@ -1,0 +1,10 @@
+joblib
+matplotlib
+nltk
+notebook
+numpy
+pandas
+plotly
+scikit-learn==1.6.1
+seaborn
+wordcloud

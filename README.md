@@ -1,121 +1,29 @@
-# 🧠 Resume Classifier — NLP + Machine Learning Project
+# Résumé Category Classifier
 
-Automatically classifies resumes into job categories using NLP techniques and multiple machine learning models.
+A notebook project that compares NLP models for classifying résumé text into job categories. It covers exploratory analysis, TF-IDF features, baseline classifiers, and an experimental nearest-neighbor SVM. Its scope is classification of the bundled dataset.
 
----
+## Reproduce the experiment
 
-## 📁 Project Structure
+Use Python 3.11 and install the dependencies from the repository root.
 
+```bash
+python -m pip install -r requirements.txt
+python -m jupyter notebook notebooks
+```
 
- Resume-Classifier-ML-Project/
-├── data/
-│ ├── download_data.ipynb
-│ └── resume-dataset/
-│ └── UpdatedResumeDataSet.csv
-├── notebook/
-│ ├── 01_EDA_Resume.ipynb
-│ ├── 02_Preprocessing_Resume.ipynb
-│ ├── 03_Model_Training_Evaluation.ipynb
-│ └── 04_Tuning_Model.ipynb
-├── models/
-│ ├── X_train.joblib
-│ ├── X_test.joblib
-│ ├── y_train.joblib
-│ └── y_test.joblib
-├── images/
-│ ├── 0.png ... 4.png
-├── .gitignore
-└── README.md
+Run the notebooks from the `notebooks/` directory, in this order. NLTK downloads its English stopword list on the first run.
 
+| Notebook | What it does |
+| --- | --- |
+| [01 · Exploratory analysis](notebooks/01_EDA_Resume.ipynb.ipynb) | Explores the text and category distributions. |
+| [02 · Preprocessing](notebooks/02_Preprocessing_Resume.ipynb) | Deduplicates the text, makes a stratified split, and learns the TF-IDF vocabulary and weights on the training split. It writes the feature matrices and labels to `models/`. |
+| [03 · Baseline evaluation](notebooks/03_Model_Training_Evaluation.ipynb) | Compares logistic regression, random forest, multinomial Naive Bayes, KNN, and one-vs-rest models on the held-out split. |
+| [04 · Local SVM](notebooks/04_hyperparamter_Model.ipynb) | Fits an SVM on a small neighborhood from the training data for each test example. It uses the training majority class for single-class neighborhoods. |
 
----
+Start with notebook 02 to regenerate the feature files before running either evaluation. The metrics printed by notebooks 03 and 04 come from the updated split and preprocessing pipeline. The [images](images/) folder contains plots from earlier runs.
 
-## 📊 Dataset
+On the 34-example held-out split, one-vs-rest KNN classified 29 examples correctly (85.3%) and the local SVM classified 28 correctly (82.4%). These results describe this small dataset split.
 
-- **Source**: The dataset is downloaded from Kaggle.
-- **File**: `UpdatedResumeDataSet.csv`
-- **Target Variable**: Category of job role.
-- **Text Column**: Resume content.
+## Dataset
 
----
-
-## 🔍 Project Workflow
-
-### 1. EDA (Exploratory Data Analysis)
-
-- Checked class distribution and common keywords.
-- Visualized most frequent words using word clouds and bar charts.
-
-### 2. Preprocessing
-
-- Removed URLs, special characters, stopwords, etc.
-- Encoded categorical labels.
-- Applied TF-IDF vectorization.
-- Split dataset into train and test sets.
-- Saved processed data using `joblib`.
-
-### 3. Model Training & Evaluation
-
-Evaluated several classifiers using accuracy, confusion matrix, and classification report:
-
-| Model               | Accuracy |
-|---------------------|----------|
-| Logistic Regression | 0.53     |
-| Random Forest       | 0.76     |
-| Naive Bayes         | 0.35     |
-| K-Nearest Neighbors | 0.82     |
-| One-vs-Rest (SVC)   | 0.79     |
-| One-vs-Rest (KNN)   | 0.82     |
-
-
-
-## 🔧 Advanced Tuning & Local SVM
-
-In `04_Tuning_Model.ipynb`, we applied two main optimization techniques:
-
-### A. Hyperparameter Tuning with Optuna
-
-- Optimized `C`, `kernel`, and `gamma` parameters for SVC.
-- Improved generalization:
-  - **Training Accuracy**: dropped slightly (92% → 88%) to reduce overfitting.
-  - **Testing Accuracy**: increased (82% → 85%).
-
-
-> 🔍 Note: The Optuna optimization code was removed after applying the best
-
-
-We implemented a **Localized SVM** approach:
-
-- For every resume vector (training or test):
-  - Find the `k` nearest neighbors using `sklearn.NearestNeighbors`.
-  - Train a dedicated `SVC` model only on those neighbors.
-  - Use it to predict the class of the target point.
-- If training fails (e.g., only one class), we fallback to the global majority class.
-
-> This method captures **local patterns** in the data and is especially useful in **non-linear or imbalanced** datasets. However, it is computationally expensive, as it trains an SVM for every single point.
-
-
----
-
-## 📈 Visualizations
-
-- All plots and evaluation graphs (e.g., word clouds, confusion matrices) are saved in the `images/` folder.
-
-
-## 📌 Future Improvements
-
-- Use advanced NLP models like **BERT**, **spaCy**, or **LlamaIndex**.
-- Segment resume content into sections (e.g., skills, education) before classification.
-- Build a **Streamlit** or **Flask** app to deploy the model.
-
-
-## 📬 Contact
-
-For any feedback or suggestions, feel free to reach out:
-
-**Name**: Younes Elshafi  
-**Email**: [younes.ai.dev@gmail.com](mailto:younes.ai.dev@gmail.com)
-
-
-
-
+[UpdatedResumeDataSet.csv](data/resume-dataset/UpdatedResumeDataSet.csv) contains the `Resume` text and `Category` label. The separate [download notebook](data/download_data.ipynb) records how the dataset was obtained.
